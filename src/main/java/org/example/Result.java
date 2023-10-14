@@ -2,11 +2,10 @@ package org.example;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class Result<T> {
     private T value;
-    private Throwable exception;
+    private Exception exception;
 
     public boolean isSuccess() { return exception == null; }
 
@@ -14,7 +13,7 @@ public class Result<T> {
 
     public T getOrNull() { return value; }
 
-    public Throwable getExceptionOrNull() { return exception; }
+    public Exception getExceptionOrNull() { return exception; }
 
     @Override
     public String toString() {
@@ -27,15 +26,15 @@ public class Result<T> {
 
     private Result(T value) { this.value = value; }
 
-    private Result(Throwable exception) { this.exception = exception; }
+    private Result(Exception exception) { this.exception = exception; }
 
     public static <T> Result<T> success(T value) {
         return new Result<>(value);
     }
 
-    public static <T> Result<T> failure(Throwable exception) { return new Result<>(exception); }
+    public static <T> Result<T> failure(Exception exception) { return new Result<>(exception); }
 
-    public T getOrThrow() throws Throwable {
+    public T getOrThrow() throws Exception {
         if (isFailure()) {
             throw exception;
         }
@@ -43,16 +42,8 @@ public class Result<T> {
         return value;
     }
 
-    public static <R> Result<R> runCatching(Supplier<R> block) {
-        try {
-            return Result.success(block.get());
-        } catch (Throwable e) {
-            return Result.failure(e);
-        }
-    }
-
-    public <R> R fold(Function<T, R> onSuccess, Function<Throwable, R> onFailure) {
-        Throwable exception = this.getExceptionOrNull();
+    public <R> R fold(Function<T, R> onSuccess, Function<Exception, R> onFailure) {
+        Exception exception = this.getExceptionOrNull();
 
         if(exception == null) {
             return onSuccess.apply(value);
@@ -61,7 +52,7 @@ public class Result<T> {
         return onFailure.apply(exception);
     }
 
-    public Result<T> onFailure(Consumer<Throwable> action) {
+    public Result<T> onFailure(Consumer<Exception> action) {
         if (isFailure()) {
             action.accept(exception);
         }

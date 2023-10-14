@@ -7,7 +7,7 @@ public class Main {
         Result<String> something = Result.success("Some text");
 
         Function<String, Integer> getLength = String::length;
-        Function<Throwable, Integer> getMessageLength = a -> a.getMessage().length();
+        Function<Exception, Integer> getMessageLength = a -> a.getMessage().length();
 
         Integer length = something.fold(getLength, getMessageLength);
 
