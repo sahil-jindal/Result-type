@@ -1,5 +1,8 @@
 package org.example;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -28,17 +31,16 @@ public class Result<T> {
 
     private Result(Exception exception) { this.exception = exception; }
 
-    public static <T> Result<T> success(T value) {
+    @Contract(value = "_ -> new", pure = true)
+    public static <T> @NotNull Result<T> success(T value) {
         return new Result<>(value);
     }
 
-    public static <T> Result<T> failure(Exception exception) { return new Result<>(exception); }
+    @Contract(value = "_ -> new", pure = true)
+    public static <T> @NotNull Result<T> failure(Exception exception) { return new Result<>(exception); }
 
     public T getOrThrow() throws Exception {
-        if (isFailure()) {
-            throw exception;
-        }
-
+        throwOnFailure();
         return value;
     }
 
@@ -66,6 +68,10 @@ public class Result<T> {
         }
 
         return this;
+    }
+
+    private void throwOnFailure() throws Exception {
+        if(isFailure()) throw exception;
     }
 }
 
