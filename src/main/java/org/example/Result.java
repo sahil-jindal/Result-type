@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class Result<T> {
     private T value;
@@ -44,6 +45,14 @@ public class Result<T> {
         return value;
     }
 
+    public static <R> Result<R> runCatching(Supplier<R> block) {
+        try {
+            return Result.success(block.get());
+        } catch (Exception e) {
+            return Result.failure(e);
+        }
+    }
+
     public <R> R fold(Function<T, R> onSuccess, Function<Exception, R> onFailure) {
         Exception exception = this.getExceptionOrNull();
 
@@ -52,6 +61,22 @@ public class Result<T> {
         }
 
         return onFailure.apply(exception);
+    }
+
+    public <R> Result<R> map(Function<T, R> transform) {
+        if (isSuccess()) {
+            return Result.success(transform.apply(value));
+        }
+
+        return Result.failure(exception);
+    }
+
+    public <R> Result<R> mapCatching(Function<T, R> transform) {
+        if (isSuccess()) {
+            return runCatching(() -> transform.apply(value));
+        }
+
+        return Result.failure(exception);
     }
 
     public Result<T> onFailure(Consumer<Exception> action) {

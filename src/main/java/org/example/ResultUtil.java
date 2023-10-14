@@ -3,17 +3,8 @@ package org.example;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class ResultUtil {
-
-    public static <R> Result<R> runCatching(Supplier<R> block) {
-        try {
-            return Result.success(block.get());
-        } catch (Exception e) {
-            return Result.failure(e);
-        }
-    }
 
     public static <R> R getOrElse(@NotNull Result<? extends R> result, Function<Exception, R> onFailure) {
         Exception exception = result.getExceptionOrNull();
@@ -50,6 +41,6 @@ public class ResultUtil {
             return (Result<R>) result;
         }
 
-        return runCatching(() -> transform.apply(exception));
+        return Result.runCatching(() -> transform.apply(exception));
     }
 }
