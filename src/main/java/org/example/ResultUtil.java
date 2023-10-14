@@ -1,9 +1,12 @@
 package org.example;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ResultUtil {
+
     public static <R> Result<R> runCatching(Supplier<R> block) {
         try {
             return Result.success(block.get());
@@ -11,7 +14,8 @@ public class ResultUtil {
             return Result.failure(e);
         }
     }
-    public static <R> R getOrElse(Result<? extends R> result, Function<Exception, R> onFailure) {
+
+    public static <R> R getOrElse(@NotNull Result<? extends R> result, Function<Exception, R> onFailure) {
         Exception exception = result.getExceptionOrNull();
 
         if(exception == null) {
@@ -21,7 +25,7 @@ public class ResultUtil {
         return onFailure.apply(exception);
     }
 
-    public static <R> R getOrDefault(Result<? extends R> result, R defaultValue) {
+    public static <R> R getOrDefault(@NotNull Result<? extends R> result, R defaultValue) {
         if(result.isFailure()) {
             return defaultValue;
         }
@@ -29,7 +33,7 @@ public class ResultUtil {
         return result.getOrNull();
     }
 
-    public static <R> Result<R> recover( Result<? extends R> result, Function<Exception, R> transform) {
+    public static <R> @NotNull Result<R> recover(@NotNull Result<? extends R> result, Function<Exception, R> transform) {
         Exception exception = result.getExceptionOrNull();
 
         if(exception == null) {
@@ -39,7 +43,7 @@ public class ResultUtil {
         return Result.success(transform.apply(exception));
     }
 
-    public static <R> Result<R> recoverCatching(Result<? extends R> result, Function<Exception, R> transform) {
+    public static <R> Result<R> recoverCatching(@NotNull Result<? extends R> result, Function<Exception, R> transform) {
         Exception exception = result.getExceptionOrNull();
 
         if(exception == null) {
