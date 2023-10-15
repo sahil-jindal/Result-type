@@ -15,3 +15,7 @@ If you choose to use this project, proceed with caution. Make sure you thoroughl
 ## :gear: Contributing
 
 Contributions are not encouraged for this project due to its experimental nature. If you believe you have a valuable suggestion or improvement, please open a discussion before making any changes.
+
+## :page_with_curl: License
+
+This project is released under an [MIT License](LICENSE) unless otherwise specified. See the [LICENSE](LICENSE) file for details.
