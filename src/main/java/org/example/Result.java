@@ -39,9 +39,7 @@ public class Result<T> {
     }
 
     public <R> R fold(Function<T, R> onSuccess, Function<Exception, R> onFailure) {
-        Exception exception = this.getExceptionOrNull();
-
-        if(exception == null) {
+        if(isSuccess()) {
             return onSuccess.apply(value);
         }
 
