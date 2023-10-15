@@ -24,7 +24,7 @@ public class ResultUtil {
         return result.getOrNull();
     }
 
-    public <T, R> Result<R> mapCatching(Result<T> result, Function<T, R> transform) {
+    public <T, R> Result<R> mapCatching(@NotNull Result<T> result, Function<T, R> transform) {
         if (result.isSuccess()) {
             return runCatching(() -> transform.apply(result.getOrNull()));
         }
