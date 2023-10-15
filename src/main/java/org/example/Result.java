@@ -14,9 +14,7 @@ public class Result<T> {
     private Result(Exception exception) { this.exception = exception; }
 
     @Contract(value = "_ -> new", pure = true)
-    public static <T> @NotNull Result<T> success(T value) {
-        return new Result<>(value);
-    }
+    public static <T> @NotNull Result<T> success(T value) { return new Result<>(value); }
 
     @Contract(value = "_ -> new", pure = true)
     public static <T> @NotNull Result<T> failure(Exception exception) { return new Result<>(exception); }
