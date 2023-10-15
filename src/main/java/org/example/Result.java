@@ -32,9 +32,7 @@ public class Result<T> {
 
     public Exception getExceptionOrNull() { return exception; }
 
-    private void throwOnFailure() throws Exception {
-        if(isFailure()) throw exception;
-    }
+    private void throwOnFailure() throws Exception { if(isFailure()) throw exception; }
 
     public <R> R fold(Function<T, R> onSuccess, Function<Exception, R> onFailure) {
         if(isSuccess()) {
