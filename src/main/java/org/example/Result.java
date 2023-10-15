@@ -22,7 +22,7 @@ public class Result<T> {
     @Override
     public String toString() {
         if(isFailure()) {
-            return "Failure(" + value.toString() + ")";
+            return "Failure(" + exception.getMessage() + ")";
         }
 
         return "Success(" + value.toString() + ")";

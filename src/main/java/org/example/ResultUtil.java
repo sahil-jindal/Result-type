@@ -1,7 +1,6 @@
 package org.example;
 
 import org.jetbrains.annotations.NotNull;
-
 import java.util.function.Function;
 
 public class ResultUtil {
@@ -28,7 +27,7 @@ public class ResultUtil {
         Exception exception = result.getExceptionOrNull();
 
         if(exception == null) {
-            return (Result<R>) result;
+            return Result.success(result.getOrNull());
         }
 
         return Result.success(transform.apply(exception));
@@ -38,7 +37,7 @@ public class ResultUtil {
         Exception exception = result.getExceptionOrNull();
 
         if(exception == null) {
-            return (Result<R>) result;
+            return Result.success(result.getOrNull());
         }
 
         return Result.runCatching(() -> transform.apply(exception));
