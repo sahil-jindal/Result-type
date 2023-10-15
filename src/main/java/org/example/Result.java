@@ -2,31 +2,12 @@ package org.example;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class Result<T> {
     private T value;
     private Exception exception;
-
-    public boolean isSuccess() { return exception == null; }
-
-    public boolean isFailure() { return exception != null; }
-
-    public T getOrNull() { return value; }
-
-    public Exception getExceptionOrNull() { return exception; }
-
-    @Override
-    public String toString() {
-        if(isFailure()) {
-            return "Failure(" + exception.getMessage() + ")";
-        }
-
-        return "Success(" + value.toString() + ")";
-    }
 
     private Result(T value) { this.value = value; }
 
@@ -40,17 +21,21 @@ public class Result<T> {
     @Contract(value = "_ -> new", pure = true)
     public static <T> @NotNull Result<T> failure(Exception exception) { return new Result<>(exception); }
 
+    public boolean isSuccess() { return exception == null; }
+
+    public boolean isFailure() { return exception != null; }
+
+    public T getOrNull() { return value; }
+
     public T getOrThrow() throws Exception {
         throwOnFailure();
         return value;
     }
 
-    public static <R> Result<R> runCatching(Supplier<R> block) {
-        try {
-            return Result.success(block.get());
-        } catch (Exception e) {
-            return Result.failure(e);
-        }
+    public Exception getExceptionOrNull() { return exception; }
+
+    private void throwOnFailure() throws Exception {
+        if(isFailure()) throw exception;
     }
 
     public <R> R fold(Function<T, R> onSuccess, Function<Exception, R> onFailure) {
@@ -66,14 +51,6 @@ public class Result<T> {
     public <R> Result<R> map(Function<T, R> transform) {
         if (isSuccess()) {
             return Result.success(transform.apply(value));
-        }
-
-        return Result.failure(exception);
-    }
-
-    public <R> Result<R> mapCatching(Function<T, R> transform) {
-        if (isSuccess()) {
-            return runCatching(() -> transform.apply(value));
         }
 
         return Result.failure(exception);
@@ -95,8 +72,13 @@ public class Result<T> {
         return this;
     }
 
-    private void throwOnFailure() throws Exception {
-        if(isFailure()) throw exception;
+    @Override
+    public String toString() {
+        if(isFailure()) {
+            return "Failure(" + exception.getMessage() + ")";
+        }
+
+        return "Success(" + value.toString() + ")";
     }
 }
 

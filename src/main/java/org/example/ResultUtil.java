@@ -2,6 +2,7 @@ package org.example;
 
 import org.jetbrains.annotations.NotNull;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class ResultUtil {
 
@@ -23,6 +24,14 @@ public class ResultUtil {
         return result.getOrNull();
     }
 
+    public <T, R> Result<R> mapCatching(Result<T> result, Function<T, R> transform) {
+        if (result.isSuccess()) {
+            return runCatching(() -> transform.apply(result.getOrNull()));
+        }
+
+        return Result.failure(result.getExceptionOrNull());
+    }
+
     public static <R> @NotNull Result<R> recover(@NotNull Result<? extends R> result, Function<Exception, R> transform) {
         Exception exception = result.getExceptionOrNull();
 
@@ -40,6 +49,14 @@ public class ResultUtil {
             return Result.success(result.getOrNull());
         }
 
-        return Result.runCatching(() -> transform.apply(exception));
+        return runCatching(() -> transform.apply(exception));
+    }
+
+    public static <R> Result<R> runCatching(Supplier<R> block) {
+        try {
+            return Result.success(block.get());
+        } catch (Exception e) {
+            return Result.failure(e);
+        }
     }
 }
