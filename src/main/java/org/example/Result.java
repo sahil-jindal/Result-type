@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class Result<T> implements Serializable {
+public final class Result<T> implements Serializable {
     private T value;
     private Exception exception;
 
