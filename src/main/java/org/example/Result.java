@@ -69,7 +69,7 @@ public final class Result<T> implements Serializable {
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         if(isFailure()) {
             return "Failure(" + exception.getMessage() + ")";
         }
