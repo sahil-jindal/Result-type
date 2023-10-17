@@ -8,18 +8,27 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class Result<T> implements Serializable {
-    private T value;
-    private Exception exception;
+    private final T value;
+    private final Exception exception;
 
-    private Result(T value) { this.value = value; }
+    private Result(T value, Exception exception) {
+        this.value = value;
+        this.exception = exception;
+    }
 
-    private Result(Exception exception) { this.exception = exception; }
+    private Result(String message) {
+        this.value = null;
+        this.exception = new Exception(message);
+    }
 
     @Contract(value = "_ -> new", pure = true)
-    public static <T> @NotNull Result<T> success(T value) { return new Result<>(value); }
+    public static <T> @NotNull Result<T> success(T value) { return new Result<>(value,null); }
 
     @Contract(value = "_ -> new", pure = true)
-    public static <T> @NotNull Result<T> failure(Exception exception) { return new Result<>(exception); }
+    public static <T> @NotNull Result<T> failure(Exception exception) { return new Result<>(null, exception); }
+
+    @Contract(value = "_ -> new", pure = true)
+    public static <T> @NotNull Result<T> failure(String message) { return new Result<>(message); }
 
     public boolean isSuccess() { return exception == null; }
 
@@ -74,7 +83,7 @@ public final class Result<T> implements Serializable {
             return "Failure(" + exception.getMessage() + ")";
         }
 
-        return "Success(" + value.toString() + ")";
+        return "Success(" + value + ")";
     }
 }
 
