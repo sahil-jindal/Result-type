@@ -1,8 +1,8 @@
 package org.example;
 
 import org.jetbrains.annotations.NotNull;
+import java.util.concurrent.Callable;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class ResultUtil {
 
@@ -24,7 +24,7 @@ public class ResultUtil {
         return result.getOrNull();
     }
 
-    public <T, R> Result<R> mapCatching(@NotNull Result<T> result, Function<T, R> transform) {
+    public static <T, R> Result<R> mapCatching(@NotNull Result<T> result, Function<T, R> transform) {
         if (result.isSuccess()) {
             return runCatching(() -> transform.apply(result.getOrNull()));
         }
@@ -52,9 +52,9 @@ public class ResultUtil {
         return runCatching(() -> transform.apply(exception));
     }
 
-    public static <R> Result<R> runCatching(Supplier<R> block) {
+    public static <R> Result<R> runCatching(Callable<R> block) {
         try {
-            return Result.success(block.get());
+            return Result.success(block.call());
         } catch (Exception e) {
             return Result.failure(e);
         }
