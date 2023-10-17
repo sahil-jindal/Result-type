@@ -48,7 +48,7 @@ public class Main {
         Result<Integer> recoveredResult = ResultUtil.recover(failureResult, exception -> -1);
         System.out.println("Recovered result: " + recoveredResult);
 
-        Result<Integer> recoveredCatchingResult = ResultUtil.recoverCatching(failureResult, exception -> -2);
+        Result<Integer> recoveredCatchingResult = ResultUtil.recoverCatching(failureResult, exception -> Integer.parseInt("2df"));
         System.out.println("Recovered catching result: " + recoveredCatchingResult);
 
         Result<Integer> runCatchingResult = ResultUtil.runCatching(() -> {
