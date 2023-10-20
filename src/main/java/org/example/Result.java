@@ -4,6 +4,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -43,7 +44,23 @@ public final class Result<T> implements Serializable {
 
     public Exception getExceptionOrNull() { return exception; }
 
-    private void throwOnFailure() throws Exception { if(isFailure()) throw exception; }
+    public static <R> R getOrElse(@NotNull Result<? extends R> result, Function<Exception, R> onFailure) {
+        Exception exception = result.getExceptionOrNull();
+
+        if(exception == null) {
+            return result.getOrNull();
+        }
+
+        return onFailure.apply(exception);
+    }
+
+    public static <R> R getOrDefault(@NotNull Result<? extends R> result, R defaultValue) {
+        if(result.isFailure()) {
+            return defaultValue;
+        }
+
+        return result.getOrNull();
+    }
 
     public <R> R fold(Function<T, R> onSuccess, Function<Exception, R> onFailure) {
         if(isSuccess()) {
@@ -56,6 +73,14 @@ public final class Result<T> implements Serializable {
     public <R> Result<R> map(Function<T, R> transform) {
         if (isSuccess()) {
             return Result.success(transform.apply(value));
+        }
+
+        return Result.failure(exception);
+    }
+
+    public <R> Result<R> mapCatching(Function<T, R> transform) {
+        if (isSuccess()) {
+            return runCatching(() -> transform.apply(value));
         }
 
         return Result.failure(exception);
@@ -76,6 +101,36 @@ public final class Result<T> implements Serializable {
 
         return this;
     }
+
+    public static <R> @NotNull Result<R> recover(@NotNull Result<? extends R> result, Function<Exception, R> transform) {
+        Exception exception = result.getExceptionOrNull();
+
+        if(exception == null) {
+            return Result.success(result.getOrNull());
+        }
+
+        return Result.success(transform.apply(exception));
+    }
+
+    public static <R> Result<R> recoverCatching(@NotNull Result<? extends R> result, Function<Exception, R> transform) {
+        Exception exception = result.getExceptionOrNull();
+
+        if(exception == null) {
+            return Result.success(result.getOrNull());
+        }
+
+        return runCatching(() -> transform.apply(exception));
+    }
+
+    public static <R> Result<R> runCatching(Callable<R> block) {
+        try {
+            return Result.success(block.call());
+        } catch (Exception e) {
+            return Result.failure(e);
+        }
+    }
+
+    private void throwOnFailure() throws Exception { if(isFailure()) throw exception; }
 
     @Override
     public @NotNull String toString() {
